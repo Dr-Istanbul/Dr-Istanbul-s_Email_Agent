@@ -1,0 +1,24 @@
+{
+  "email_agent_config": {
+    "sender_info": {
+      "sender_name": "Your Name",
+      "company": "Your Company",
+      "email": "your.email@company.com"
+    },
+    "ai_settings": {
+      "model": "claude-3-sonnet-20240229",
+      "temperature": 0.3,
+      "max_tokens": 1000
+    },
+    "gmail_integration": {
+      "draft_folder": "Drafts",
+      "auto_send": false,
+      "default_signature": true
+    },
+    "email_templates": {
+      "follow_up": "Follow-up email template",
+      "meeting_request": "Meeting request template",
+      "client_update": "Client update template"
+    }
+  }
+}

@@ -1,0 +1,198 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama3-8b-8192\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a professional email assistant. You MUST respond with ONLY a valid JSON object. Use \\\\n for line breaks in the email body content, but ensure the JSON structure itself is clean and parseable. Format: {\\\"subject\\\":\\\"...\\\",\\\"body\\\":\\\"Dear [Name],\\\\n\\\\n[paragraph 1]\\\\n\\\\n[paragraph 2]\\\\n\\\\nBest regards,\\\\n[Sender Name]\\\\n[Title]\\\\n[Company]\\\\n[Phone]\\\\n[Email]\\\",\\\"recipient_email\\\":\\\"...\\\"}\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Generate a professional follow-up email for: Send a follow-up email to John Smith from ABC Corp about the website redesign proposal we discussed yesterday. Sender: Sarah Johnson, Digital Marketing Manager at TechSolutions Inc, sarah@techsolutions.com, (555) 123-4567. Return JSON with: subject, body (with proper \\\\n line breaks), recipient_email (john.smith@abccorp.com)\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 600\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        256,
+        -112
+      ],
+      "id": "ceb45767-d0a7-4e3c-8c74-70e8668bcc6d",
+      "name": "HTTP Request",
+      "credentials": {
+        "huggingFaceApi": {
+          "id": "zKhbm9ebqKB8NZvi",
+          "name": "HuggingFaceApi account"
+        },
+        "httpBearerAuth": {
+          "id": "DMSYAelqKSm22PUT",
+          "name": "Bearer Auth account"
+        },
+        "httpHeaderAuth": {
+          "id": "UPm2MS2EVy061Drj",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "6814ab78-75de-4851-82a8-8725d2160854",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        -96
+      ],
+      "id": "f95c6675-edb6-4d89-a854-6b9b8e7aadad",
+      "name": "Webhook",
+      "webhookId": "6814ab78-75de-4851-82a8-8725d2160854"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.body }}",
+        "options": {
+          "sendTo": "={{ $json.to_email }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "c5745db2-4be5-433e-9fc3-259ca64a74a7",
+      "name": "Create a draft",
+      "webhookId": "16f39265-8620-4bbf-9427-9c10f5bfbe14",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9cf9hJUiSkwydwJs",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"subject\": \"{{$json.subject}}\",\n  \"preview\": \"Draft created for: {{$('Webhook').first().json.body.user_input}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        864,
+        -16
+      ],
+      "id": "bef5277f-e03a-410c-a7d3-7eae9f2733f0",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0225b5e4-b742-481a-829f-b9c8477284e1",
+              "name": "subject",
+              "value": "={{ JSON.parse($json.choices[0].message.content.replace(/\\n/g, ' ').replace(/\\s+/g, ' ')).subject }}",
+              "type": "string"
+            },
+            {
+              "id": "fc77c181-9b32-44d1-9708-4f1458728936",
+              "name": "body",
+              "value": "={{ JSON.parse($json.choices[0].message.content.replace(/\\n/g, ' ').replace(/\\s+/g, ' ')).body }}",
+              "type": "string"
+            },
+            {
+              "id": "eeab29a8-6965-4237-aac1-d18540b19c0b",
+              "name": "to_email",
+              "value": "={{ JSON.parse($json.choices[0].message.content.replace(/\\n/g, ' ').replace(/\\s+/g, ' ')).recipient_email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        -48
+      ],
+      "id": "1d67873d-6bb2-44e6-9e54-342cae983d12",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a draft": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fb4b75ca-5ef3-49ad-bdbc-08170157b0f2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c4f8e0af104f23a2f2d24cb37f818652858b019efafcfb30d265091f707b1699"
+  },
+  "id": "HKGBukUUity72nqT",
+  "tags": []
+}

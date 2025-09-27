@@ -1,0 +1,21 @@
+# API keys and secrets
+*.env
+.env.local
+config.json
+secrets.json
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Google OAuth credentials - CRITICAL!
+client_secret_*.json
+*.json

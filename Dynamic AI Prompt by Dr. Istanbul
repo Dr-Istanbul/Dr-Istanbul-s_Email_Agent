@@ -1,0 +1,11 @@
+{
+  "model": "llama3-8b-8192",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Create a professional email for this request: {{$node["Webhook"].json["body"]["user_input"]}}. Sender: {{$node["Webhook"].json["body"]["sender_name"]}} ({{$node["Webhook"].json["body"]["sender_title"]}}) from {{$node["Webhook"].json["body"]["company"]}}. Respond **ONLY** with valid JSON: {\"recipient\": \"email\", \"subject\": \"subject\", \"content\": \"email body\"}"
+    }
+  ],
+  "temperature": 0.3,
+  "max_tokens": 800
+}

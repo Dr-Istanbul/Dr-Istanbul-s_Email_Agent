@@ -1,0 +1,11 @@
+{
+  "model": "llama3-8b-8192",
+  "messages": [
+    {
+      "role": "user",
+      "content": "As {{sender_name}} from {{company}}, create professional email for: {{user_input}}. Respond ONLY with: {\"to\":\"\",\"subject\":\"\",\"body\":\"\"}"
+    }
+  ],
+  "temperature": 0.3,
+  "max_tokens": 1000
+}

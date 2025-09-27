@@ -1,0 +1,235 @@
+1
+00:00:00,000 --> 00:00:02,500
+Hi, here is our Email automation workflow on n8n
+
+2
+00:00:02,501 --> 00:00:05,000
+First, we must 'Execute workflow' to get started
+
+3
+00:00:05,001 --> 00:00:08,000
+Now, this is an interface where user initiates a trigger, to write email
+
+4
+00:00:08,001 --> 00:00:12,000
+User can write their own or choose from examples
+
+5
+00:00:12,001 --> 00:00:18,000
+User clicks on Generate button to start writing
+
+6
+00:00:18,001 --> 00:00:23,000
+Now, we come back to watch our workflow running
+
+7
+00:00:23,001 --> 00:00:28,000
+Note, all nodes turning green, and 'Wrokflow executed successfully' message
+
+8
+00:00:28,001 --> 00:00:33,000
+Now, we come back to see our draft in Gmail
+
+9
+00:00:33,001 --> 00:00:37,000
+and... here it lands, safely
+
+10
+00:00:37,001 --> 00:00:40,000
+let's open to see what it has for us, okay
+
+11
+00:00:40,001 --> 00:00:43,000
+Now, come back to our n8n workflow
+
+12
+00:00:43,001 --> 00:00:46,000
+'Execute workflow' to try another instance
+
+13
+00:00:46,001 --> 00:00:49,000
+Moving to our trigger interface for user
+
+14
+00:00:46,001 --> 00:00:50,000
+Dr. Istanbul's Email Agent is making things happen
+
+15
+00:00:50,001 --> 00:00:53,000
+Let's email Jane for meeting follow-up
+
+16
+00:00:50,001 --> 00:00:53,000
+Let's email Jane for meeting follow-up
+
+17
+00:00:53,001 --> 00:00:56,000
+Now we click on 'Generate to continue
+
+18
+00:00:56,001 --> 00:00:59,000
+Let's watch our 'backend' workflow running
+
+19
+00:00:59,001 --> 00:01:03,000
+Note, the nodes turning green
+
+20
+00:01:03,001 --> 00:01:06,000
+our agent is busy in your service...
+
+21
+00:01:06,001 --> 00:01:09,000
+and..., here we go, 'Workflow executed successfully'
+
+22
+00:01:09,001 --> 00:01:12,000
+let's see if it really executed
+
+23
+00:01:12,001 --> 00:01:15,000
+Congratulations! here it comes
+
+24
+00:01:15,001 --> 00:01:17,000
+Let's minimize our previous one
+
+25
+00:01:17,001 --> 00:01:20,000
+Open new one, and yes, here it is 
+
+26
+00:01:20,001 --> 00:01:23,000
+Now, we want to do something different
+
+27
+00:01:23,001 --> 00:01:26,000
+'Execute workflow' once more
+
+28
+00:01:26,001 --> 00:01:29,000
+Let's move to Dr. Istanbul's Email Agent interface
+
+29
+00:01:29,001 --> 00:01:32,000
+This time we will write trigger by ourselves, no examples
+
+30
+00:01:42,001 --> 00:01:45,000
+I hope Ali will be happy with this
+
+31
+00:01:42,001 --> 00:01:45,000
+I hope Ali will be happy with this
+
+32
+00:01:45,001 --> 00:01:48,000
+Let's watch our workflow running
+
+33
+00:01:48,001 --> 00:01:51,000
+It works hard, good boy!
+
+34
+00:01:52,001 --> 00:01:55,000
+and... yes, 'Workflow executed successfully'
+
+35
+00:01:55,001 --> 00:01:58,000
+Now, time to make confirmation
+
+36
+00:01:58,001 --> 00:02:01,000
+Refresh the Gmail drafts tab
+
+37
+00:02:01,001 --> 00:02:04,000
+Yes, we have email draft for our Ali here
+
+38
+00:02:04,001 --> 00:02:07,000
+Minimize the last one, and open the newest
+
+39
+00:02:07,001 --> 00:02:10,000
+Yes, this email requests Ali for report
+
+40
+00:02:10,001 --> 00:02:13,000
+Now, let's understand the science (or tech) 'backend'
+
+41
+00:02:13,001 --> 00:02:16,000
+All our workflow nodes are important
+
+42
+00:02:16,001 --> 00:02:20,000
+However, we're interested in how our emails were actually drafted
+
+43
+00:02:20,001 --> 00:02:23,000
+So, we put our dynamic prompt here in 'HTTP Request' node
+
+44
+00:02:23,001 --> 00:02:27,000
+Open it, and you will see in URL field that it uses an API for OpenAI
+
+45
+00:02:27,001 --> 00:02:30,000
+This AI drafts emails for us when we trigger via interface message
+
+46
+00:02:30,001 --> 00:02:33,000
+Let's seen on left how we our trigger message arrives here
+
+47
+00:02:30,001 --> 00:02:33,000
+See our trigger from 'Dr. Istanbul's Email Agent' for email to Ali
+
+48
+00:02:33,001 --> 00:02:36,000
+See our trigger from 'Dr. Istanbul's Email Agent' for email to Ali
+
+49
+00:02:36,001 --> 00:02:39,000
+The user trigger was recieved by 'Webhook' node on left
+
+50
+00:02:39,001 --> 00:02:42,000
+Now let's look below how HTTP processes this trigger
+
+51
+00:02:42,001 --> 00:02:45,000
+Here, we have saved a dynamic prompt in JSON format
+
+52
+00:02:45,001 --> 00:02:49,000
+Look at the prompt carefully, and you'll see beautiful expression
+
+53
+00:02:49,001 --> 00:02:52,000
+On the right, you can see AI drafted email "content" as output 
+
+54
+00:02:52,001 --> 00:02:55,000
+Thank you for watching 'Dr. Istanbul's Email Agent' in action!
+
+55
+00:02:55,001 --> 00:02:58,000
+See you again, with more serious AI by our very own 'Dr. Istanbul'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

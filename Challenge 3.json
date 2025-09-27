@@ -1,0 +1,589 @@
+{
+  "name": "Challenge 3",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama3-8b-8192\",\n  \"messages\": [{\n    \"role\": \"user\",\n    \"content\": \"You are an executive assistant. Analyze this email and respond in STRICT JSON format:\\n\\n**Email Details**\\nSubject: {{$json[0].Subject}}\\nFrom: {{$json[0].From}}\\nBody: {{$json[0].snippet}}\\n\\n**Requirements**:\\n1. Generate a professional email reply\\n2. Address all key points from the original email\\n3. Maintain the sender's tone (formal/casual)\\n4. Respond in this JSON structure:\\n{\\n  \\\"urgency\\\": \\\"high|medium|low\\\",\\n  \\\"project\\\": \\\"extracted_project_name\\\",\\n  \\\"topic\\\": \\\"main_topic\\\",\\n  \\\"containsQuestion\\\": true|false,\\n  \\\"draftReply\\\": \\\"Dear [Sender],\\\\n\\\\n[Professional response acknowledging key points]\\\\n\\\\nBest regards,\\\\n[Your Name]\\\"\\n}\\n\\n**Rules**:\\n- Set urgency=high if time-sensitive (e.g., 'urgent', 'ASAP', deadlines)\\n- Extract project names from context\\n- Extract actual names from email addresses or email context - do NOT use placeholders like [Your Name] or [Sender]\\n- Strictly read and analyze the email snippet content and reply according to the specific context and details mentioned\\n- Format draftReply as a complete email with:\\n  • Proper salutation using actual sender name\\n  • Clear response to key points mentioned in the snippet\\n  • Professional closing with actual recipient name\"\n  }],\n  \"temperature\": 0.3,\n  \"max_tokens\": 800\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1952,
+        -112
+      ],
+      "id": "aa611cc3-4b55-4aed-9a95-3eff809cd9fc",
+      "name": "HTTP Request",
+      "credentials": {
+        "huggingFaceApi": {
+          "id": "zKhbm9ebqKB8NZvi",
+          "name": "HuggingFaceApi account"
+        },
+        "httpBearerAuth": {
+          "id": "DMSYAelqKSm22PUT",
+          "name": "Bearer Auth account"
+        },
+        "httpHeaderAuth": {
+          "id": "UPm2MS2EVy061Drj",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "=Re: {{$node[\"Gmail Trigger\"].json[\"Subject\"]}}",
+        "message": "={{JSON.parse(\n  $node[\"HTTP Request\"].json[\"choices\"][0][\"message\"][\"content\"]\n  .match(/\\{\\s*\"urgency\".*?\\}/s)[0]\n)[\"draftReply\"]}}",
+        "options": {
+          "sendTo": "={{$node[\"Gmail Trigger\"].json[\"From\"]}}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2272,
+        -224
+      ],
+      "id": "6c8b7723-f831-46f4-b141-5927dea883ee",
+      "name": "Create a draft",
+      "webhookId": "ec177cd9-a98e-4d21-b8c5-3ad0d787effe",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9cf9hJUiSkwydwJs",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "q": "is:unread (subject:(urgent OR important OR project) OR body:(urgent OR important OR deadline))"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        144,
+        -176
+      ],
+      "id": "df104146-51d5-410f-8ffe-253a8fe9c777",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9cf9hJUiSkwydwJs",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "label",
+        "operation": "create",
+        "name": "Urgent",
+        "options": {
+          "labelListVisibility": "labelShow"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1760,
+        -112
+      ],
+      "id": "51140e63-aece-4145-9277-35a1551711ef",
+      "name": "Create a label",
+      "webhookId": "e206aacf-16bb-42ae-9127-cc83b79c9a8d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9cf9hJUiSkwydwJs",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "label",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        576,
+        -64
+      ],
+      "id": "662b237d-46e6-4f2d-ab92-d80172e0e7e5",
+      "name": "Get many labels",
+      "webhookId": "7d288156-fae6-4700-9868-7305385dc0e1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9cf9hJUiSkwydwJs",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.contains_question }}",
+                    "rightValue": "=true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "82e62710-16ed-4b5c-89a2-51873435d2d3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Contains Question"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2cd2c279-2349-4941-8eeb-8bc85ea99eda",
+                    "leftValue": "={{ $json.urgency === \"high\" }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Urgent Email"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a536ced-82c1-4c63-91b4-81e1a3b0e585",
+                    "leftValue": "={{ $json.project && $json.project !== null }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Project Email"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "25991a87-c808-4d70-a702-0a0dcd1c10d2",
+                    "leftValue": "={{ $json.action === \"create_new\" }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Create Label"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1344,
+        -176
+      ],
+      "id": "5084c48a-d0e1-404d-815f-96a29438d936",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type ",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\n  \"model\": \"llama3-8b-8192\",\n\n  \"messages\": [\n\n    {\n\n      \"role\": \"system\",\n\n      \"content\": \"You are an expert executive assistant AI that classifies emails for business professionals. You analyze emails and return structured JSON responses for automated processing. Be precise, consistent, and professional in your classifications.\"\n\n    },\n\n    {\n\n      \"role\": \"user\", \n\n      \"content\": \"Analyze this email and classify it for an executive assistant workflow:\\n\\n**EMAIL DETAILS:**\\nSubject: {{$json.subject}}\\nFrom: {{$json.sender_name}} <{{$json.sender_email}}>\\nBody: {{$json.body}}\\nGmail Labels: {{$json.label_names}}\\nUrgency Keywords Found: {{$json.urgency_indicators}}\\nMarked Important: {{$json.is_important}}\\n\\n**CLASSIFICATION TASK:**\\nReturn a JSON response with this exact structure:\\n\\n{\\n  \\\"action\\\": \\\"use_existing\\\",\\n  \\\"label\\\": \\\"folder_name\\\",\\n  \\\"reasoning\\\": \\\"brief explanation of classification decision\\\",\\n  \\\"contains_question\\\": true/false,\\n  \\\"urgency\\\": \\\"high/medium/low\\\",\\n  \\\"project\\\": \\\"detected project name or null\\\",\\n  \\\"confidence\\\": 0.85,\\n  \\\"suggested_priority\\\": \\\"immediate/today/this_week/normal\\\"\\n}\\n\\n**AVAILABLE FOLDERS:**\\n- Urgent: Time-sensitive items requiring immediate attention\\n- Projects: Project-related communications and updates\\n- Admin: Administrative tasks, HR, policies, general business\\n- Clients: Client communications, support, relationships\\n- Personal: Personal emails that reached business inbox\\n- Follow-up: Items requiring follow-up action or tracking\\n\\n**CLASSIFICATION GUIDELINES:**\\n1. Urgency Assessment: Consider deadline words (urgent, ASAP, tomorrow, today, deadline)\\n2. Question Detection: Look for question marks, requests for information, or implied questions\\n3. Project Detection: Identify specific project names, initiatives, or ongoing work\\n4. Context Clues: Use sender reputation, subject patterns, and content themes\\n5. Confidence Scoring: Rate 0.0-1.0 based on clarity of classification signals\\n\\nRespond ONLY with valid JSON - no additional text or formatting.\"\n\n    }\n\n  ],\n\n  \"temperature\": 0.1,\n\n  \"max_tokens\": 300,\n\n  \"top_p\": 1,\n\n  \"frequency_penalty\": 0,\n\n  \"presence_penalty\": 0\n\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        768,
+        -176
+      ],
+      "id": "6d3cd124-e2c7-4b5c-b83c-be054be38f4c",
+      "name": "HTTP Request1",
+      "credentials": {
+        "aimlApi": {
+          "id": "h6xAV2cvJO8OxyyI",
+          "name": "AI/ML account"
+        },
+        "httpHeaderAuth": {
+          "id": "UPm2MS2EVy061Drj",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{$node[\"Gmail Trigger\"].json.id}}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1680,
+        -320
+      ],
+      "id": "1663b780-5a93-4b0c-83d7-b431697fa449",
+      "name": "Add label to message",
+      "webhookId": "e3467a14-423f-4ec6-863f-8e567bae8030",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9cf9hJUiSkwydwJs",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4baba9b8-0548-4a75-b8f8-6d8e83fe19c6",
+              "name": "email_id",
+              "value": "={{$json.id}}",
+              "type": "string"
+            },
+            {
+              "id": "724e4c03-e2b2-422c-9e64-e0ce26a164a2",
+              "name": "thread_id",
+              "value": "={{$json.threadId}}",
+              "type": "string"
+            },
+            {
+              "id": "a3591b4d-6e39-4a0d-9d16-fd4fdb677fbd",
+              "name": "subject",
+              "value": "={{$json.Subject || 'No Subject'}}",
+              "type": "string"
+            },
+            {
+              "id": "d9bd9e44-b05f-42b1-a3c8-4335d467e404",
+              "name": "sender_raw",
+              "value": "={{$json.From}}",
+              "type": "string"
+            },
+            {
+              "id": "b6b9ba11-c1a8-4ff1-850c-72efec86745b",
+              "name": "sender_email",
+              "value": "={{$json.From.match(/<(.+?)>/)?.[1] || $json.From.trim()}}",
+              "type": "string"
+            },
+            {
+              "id": "967b1f62-b13a-4bac-af8d-564daef8b5be",
+              "name": "sender_name",
+              "value": "=={{$json.From.match(/^(.+?)\\s*</) ? $json.From.match(/^(.+?)\\s*</)[1].replace(/[\"']/g, '').trim() : $json.From.split('@')[0]}}",
+              "type": "string"
+            },
+            {
+              "id": "14bc1c8d-6912-44fd-9b64-7cbd95445c7b",
+              "name": "body",
+              "value": "={{$json.snippet || 'No content available'}}",
+              "type": "string"
+            },
+            {
+              "id": "a3589b1b-3481-4ee2-8109-dab4f5ee6338",
+              "name": "date_timestamp",
+              "value": "={{$json.internalDate}}",
+              "type": "string"
+            },
+            {
+              "id": "29a88944-34bf-45fe-a2f7-1b51e88eceb7",
+              "name": "date_readable",
+              "value": "={{new Date(parseInt($json.internalDate)).toISOString()}}",
+              "type": "string"
+            },
+            {
+              "id": "ab6487a5-31cd-401f-b809-861edb5fdf95",
+              "name": "is_important",
+              "value": "={{$json.labels.some(label => label.name === 'IMPORTANT')}}",
+              "type": "boolean"
+            },
+            {
+              "id": "e406b7c6-8bb4-465d-aea9-779edb7d489a",
+              "name": "is_unread",
+              "value": "={{$json.labels.some(label => label.name === 'UNREAD')}}",
+              "type": "string"
+            },
+            {
+              "id": "545f715c-bbd2-412e-b1a3-3830bdab4518",
+              "name": "label_names",
+              "value": "={{$json.labels.map(label => label.name).join(', ')}}",
+              "type": "string"
+            },
+            {
+              "id": "9e12d7ca-0fb2-45f1-ada0-23950e84f1de",
+              "name": "urgency_indicators",
+              "value": "=={{[...new Set(($json.Subject + ' ' + $json.snippet).toLowerCase().match(/(urgent|asap|emergency|immediate|priority|tomorrow)/g) || [])]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": "={{ true }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        -176
+      ],
+      "id": "578d092c-95f3-47f8-b2d8-517e851b858d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json[\"choices\"][0][\"message\"][\"content\"] }}",
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"action\": {\n      \"type\": \"string\",\n      \"enum\": [\"move\", \"archive\", \"respond\", \"forward\"],\n      \"default\": \"move\"\n    },\n    \"label\": {\n      \"type\": \"string\",\n      \"enum\": [\"Urgent\", \"Important\", \"Follow-up\", \"Read Later\"],\n      \"default\": \"Important\"\n    },\n    \"urgency\": {\n      \"type\": \"string\",\n      \"enum\": [\"low\", \"medium\", \"high\", \"immediate\"],\n      \"default\": \"medium\"\n    },\n    \"confidence\": {\n      \"type\": \"number\",\n      \"minimum\": 0,\n      \"maximum\": 1\n    },\n    \"contains_question\": {\n      \"type\": \"boolean\",\n      \"default\": false\n    },\n    \"project\": {\n      \"type\": [\"string\", \"null\"],\n      \"default\": null\n    }\n  },\n  \"required\": [\"action\", \"label\", \"urgency\"]\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        976,
+        -176
+      ],
+      "id": "a9d3206d-b657-4fd7-9787-e534fa82744c",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        32
+      ],
+      "id": "2e905a29-870e-4d4f-a34f-8018b0b46584",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "fHxuWU5cTF84THzK",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        160
+      ],
+      "id": "fc88570d-9a9a-48a6-a97c-626a51c1c0af",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "fHxuWU5cTF84THzK",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a draft": {
+      "main": [
+        []
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a label": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many labels": {
+      "main": [
+        []
+      ]
+    },
+    "Switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Create a label",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        []
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "14cb109e-b550-4d62-b7a8-5f0ea6ea4821",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c4f8e0af104f23a2f2d24cb37f818652858b019efafcfb30d265091f707b1699"
+  },
+  "id": "b7FDdhoeWdB5O6ah",
+  "tags": []
+}

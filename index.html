@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Istanbul's Email Agent</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Mosaic pattern background - stained glass effect */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                /* Large magenta blocks */
+                radial-gradient(circle at 15% 25%, #8B1874 0%, #8B1874 20%, transparent 21%),
+                radial-gradient(circle at 85% 15%, #A21CAF 0%, #A21CAF 15%, transparent 16%),
+                radial-gradient(circle at 70% 80%, #7C2D9B 0%, #7C2D9B 25%, transparent 26%),
+                radial-gradient(circle at 25% 70%, #9333EA 0%, #9333EA 18%, transparent 19%),
+                
+                /* Medium yellow blocks */
+                radial-gradient(circle at 45% 35%, #F59E0B 0%, #F59E0B 12%, transparent 13%),
+                radial-gradient(circle at 90% 60%, #FBBF24 0%, #FBBF24 15%, transparent 16%),
+                radial-gradient(circle at 10% 80%, #F59E0B 0%, #F59E0B 20%, transparent 21%),
+                radial-gradient(circle at 60% 10%, #EAB308 0%, #EAB308 14%, transparent 15%),
+                
+                /* Geometric polygon shapes */
+                conic-gradient(from 45deg at 30% 40%, #8B1874 0deg 60deg, transparent 61deg 120deg, #F59E0B 121deg 180deg, transparent 181deg),
+                conic-gradient(from 120deg at 75% 25%, #A21CAF 0deg 90deg, transparent 91deg 180deg, #FBBF24 181deg 270deg, transparent 271deg),
+                conic-gradient(from 90deg at 20% 60%, #7C2D9B 0deg 120deg, transparent 121deg 240deg, #F59E0B 241deg 360deg),
+                
+                /* Small scattered fragments */
+                radial-gradient(circle at 55% 85%, #9333EA 0%, #9333EA 8%, transparent 9%),
+                radial-gradient(circle at 35% 15%, #EAB308 0%, #EAB308 6%, transparent 7%),
+                radial-gradient(circle at 80% 45%, #8B1874 0%, #8B1874 10%, transparent 11%),
+                radial-gradient(circle at 95% 85%, #F59E0B 0%, #F59E0B 7%, transparent 8%),
+                radial-gradient(circle at 5% 35%, #A21CAF 0%, #A21CAF 12%, transparent 13%);
+            
+            opacity: 0.9;
+            z-index: -1;
+        }
+        
+        .geometric-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        /* Logo in top right */
+        .logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            z-index: 10;
+            opacity: 0.9;
+            transition: opacity 0.3s ease;
+        }
+        
+        .logo:hover {
+            opacity: 1;
+        }
+        
+        .logo svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+        
+        /* Mosaic stained glass shapes */
+        .shape {
+            position: absolute;
+            opacity: 0.6;
+            filter: blur(0.5px);
+        }
+        
+        .glass-fragment {
+            position: absolute;
+            background: linear-gradient(45deg, rgba(139, 24, 116, 0.8), rgba(162, 28, 175, 0.9));
+            clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%);
+            animation: shimmer 8s ease-in-out infinite;
+        }
+        
+        .glass-fragment:nth-child(1) {
+            width: 120px;
+            height: 120px;
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+        
+        .glass-fragment:nth-child(2) {
+            width: 80px;
+            height: 80px;
+            top: 60%;
+            right: 10%;
+            background: linear-gradient(45deg, rgba(245, 158, 11, 0.8), rgba(251, 191, 36, 0.9));
+            animation-delay: 2s;
+        }
+        
+        .glass-fragment:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            bottom: 15%;
+            left: 15%;
+            background: linear-gradient(45deg, rgba(124, 45, 155, 0.7), rgba(147, 51, 234, 0.8));
+            animation-delay: 4s;
+        }
+        
+        .triangle {
+            width: 0;
+            height: 0;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-bottom: 70px solid rgba(245, 158, 11, 0.7);
+            animation: float 10s ease-in-out infinite;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+        
+        .triangle:nth-child(4) {
+            top: 20%;
+            right: 25%;
+            animation-delay: 1s;
+        }
+        
+        .hexagon {
+            width: 90px;
+            height: 90px;
+            background: rgba(139, 24, 116, 0.6);
+            clip-path: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0% 50%);
+            animation: rotate 15s linear infinite;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2));
+        }
+        
+        .hexagon:nth-child(5) {
+            top: 40%;
+            left: 8%;
+        }
+        
+        .diamond {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, rgba(251, 191, 36, 0.8), rgba(245, 158, 11, 0.9));
+            transform: rotate(45deg);
+            animation: pulse 6s ease-in-out infinite;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+        
+        .diamond:nth-child(6) {
+            top: 30%;
+            right: 5%;
+            animation-delay: 3s;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { 
+                opacity: 0.4; 
+                transform: scale(1) rotate(0deg);
+            }
+            50% { 
+                opacity: 0.8; 
+                transform: scale(1.05) rotate(2deg);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .chat-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15), 0 0 100px rgba(217, 70, 239, 0.2);
+            width: 90%;
+            max-width: 850px;
+            height: 650px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #8B1874 0%, #A21CAF 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chat-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(255,255,255,0.05) 30deg, transparent 60deg);
+            animation: rotate 20s linear infinite;
+        }
+        
+        .chat-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .chat-header p {
+            opacity: 0.95;
+            font-size: 1rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            background: linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%);
+            position: relative;
+        }
+        
+        .message {
+            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-message {
+            align-items: flex-end;
+        }
+        
+        .bot-message {
+            align-items: flex-start;
+        }
+        
+        .message-bubble {
+            max-width: 75%;
+            padding: 15px 22px;
+            border-radius: 20px;
+            word-wrap: break-word;
+            font-weight: 500;
+            line-height: 1.5;
+            position: relative;
+        }
+        
+        .user-message .message-bubble {
+            background: linear-gradient(135deg, #8B1874 0%, #A21CAF 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(139, 24, 116, 0.3);
+        }
+        
+        .bot-message .message-bubble {
+            background: white;
+            border: 2px solid rgba(139, 24, 116, 0.1);
+            color: #374151;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            color: #6b7280;
+            font-style: italic;
+            margin-left: 25px;
+            font-weight: 500;
+        }
+        
+        .typing-dots {
+            display: inline-flex;
+            margin-left: 10px;
+        }
+        
+        .typing-dots span {
+            height: 8px;
+            width: 8px;
+            background: linear-gradient(45deg, #8B1874, #F59E0B);
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-12px);
+                opacity: 1;
+            }
+        }
+        
+        .chat-input-container {
+            padding: 25px;
+            background: white;
+            border-top: 2px solid rgba(139, 24, 116, 0.1);
+            display: flex;
+            gap: 15px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid rgba(139, 24, 116, 0.2);
+            border-radius: 30px;
+            outline: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .chat-input:focus {
+            border-color: #8B1874;
+            box-shadow: 0 0 0 4px rgba(139, 24, 116, 0.1), 0 5px 20px rgba(139, 24, 116, 0.2);
+            background: white;
+        }
+        
+        .send-button {
+            background: linear-gradient(135deg, #8B1874 0%, #F59E0B 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(139, 24, 116, 0.3);
+        }
+        
+        .send-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(139, 24, 116, 0.4);
+        }
+        
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .examples {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(139, 24, 116, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .examples h3 {
+            color: #374151;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .example-item {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 20px;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            color: #4b5563;
+            font-weight: 500;
+            border: 1px solid rgba(139, 24, 116, 0.1);
+        }
+        
+        .example-item:hover {
+            background: linear-gradient(135deg, rgba(139, 24, 116, 0.1), rgba(245, 158, 11, 0.1));
+            color: #374151;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .status {
+            text-align: center;
+            padding: 12px;
+            font-size: 0.9rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .success-message {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px 0;
+            font-weight: 600;
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .error-message {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px 0;
+            font-weight: 600;
+            box-shadow: 0 5px 20px rgba(239, 68, 68, 0.3);
+        }
+        
+        .email-details {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(217, 70, 239, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .email-field {
+            margin: 8px 0;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .email-label {
+            font-weight: 700;
+            color: #d946ef;
+            min-width: 70px;
+        }
+        
+        .email-value {
+            color: #374151;
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="geometric-shapes">
+        <div class="shape triangle"></div>
+        <div class="shape circle"></div>
+        <div class="shape hexagon"></div>
+        <div class="shape square"></div>
+    </div>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🏛️ Dr. Istanbul's Email Agent</h1>
+            <p>Your AI-powered professional email assistant</p>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="examples">
+                <h3>💡 Try these examples:</h3>
+                <div class="example-item" onclick="setInput('Send a follow-up email to John Smith about the website proposal')">
+                    Send a follow-up email to John Smith about the website proposal
+                </div>
+                <div class="example-item" onclick="setInput('Email Jane Doe regarding our meeting yesterday')">
+                    Email Jane Doe regarding our meeting yesterday
+                </div>
+                <div class="example-item" onclick="setInput('Send a thank you email to the client after our presentation')">
+                    Send a thank you email to the client after our presentation
+                </div>
+            </div>
+            
+            <div class="message bot-message">
+                <div class="message-bubble">
+                    🎯 <strong>Welcome to Dr. Istanbul's Email Agent!</strong><br><br>
+                    I'm your sophisticated AI assistant specializing in professional email creation. Simply describe what email you'd like to send using natural language, and I'll craft a polished, professional message and save it directly to your Gmail drafts.
+                </div>
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            Dr. Istanbul is crafting your email<div class="typing-dots"><span></span><span></span><span></span></div>
+        </div>
+        
+        <div class="chat-input-container">
+            <input 
+                type="text" 
+                class="chat-input" 
+                id="chatInput" 
+                placeholder="Describe the email you'd like to send..."
+                onkeypress="handleKeyPress(event)"
+            >
+            <button class="send-button" onclick="sendMessage()" id="sendButton">
+                Generate
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendButton = document.getElementById('sendButton');
+        const typingIndicator = document.getElementById('typingIndicator');
+        
+        // Replace with your actual n8n webhook URL
+        const WEBHOOK_URL = 'https://c9b68a58bacc.ngrok-free.app/webhook-test/6814ab78-75de-4851-82a8-8725d2160854';
+        
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'message-bubble';
+            bubbleDiv.innerHTML = content;
+            
+            messageDiv.appendChild(bubbleDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function addEmailResponse(data, success = true) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot-message';
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'message-bubble';
+            
+            if (success) {
+                bubbleDiv.innerHTML = `
+                    <div class="success-message">
+                        ✅ <strong>Email Successfully Created!</strong><br>
+                        Your professional email has been generated and saved to Gmail drafts.
+                    </div>
+                    <div class="email-details">
+                        <div class="email-field">
+                            <span class="email-label">To:</span>
+                            <span class="email-value">${data.recipientEmail}</span>
+                        </div>
+                        <div class="email-field">
+                            <span class="email-label">Subject:</span>
+                            <span class="email-value">${data.emailSubject}</span>
+                        </div>
+                        <div class="email-field">
+                            <span class="email-label">Status:</span>
+                            <span class="email-value">✉️ Saved to Gmail Drafts</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                bubbleDiv.innerHTML = `
+                    <div class="error-message">
+                        🤖 <strong>Email Generated</strong><br>
+                        ${data.error || 'There was an error creating your email. Please try again.'}
+                    </div>
+                `;
+            }
+            
+            messageDiv.appendChild(bubbleDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function showTyping() {
+            typingIndicator.style.display = 'flex';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function hideTyping() {
+            typingIndicator.style.display = 'none';
+        }
+        
+        function setInput(text) {
+            chatInput.value = text;
+            chatInput.focus();
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        async function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, true);
+            chatInput.value = '';
+            sendButton.disabled = true;
+            sendButton.textContent = 'Creating...';
+            showTyping();
+            
+            try {
+                // Call your n8n webhook
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_input: message,
+                        sender_name: "Dr. Istanbul",
+                        sender_title: "AI Email Specialist",
+                        company: "Istanbul Digital Solutions",
+                        sender_email: "dr.istanbul@emailagent.com"
+                    })
+                });
+                
+                hideTyping();
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    // Check if email was actually saved to drafts
+                    if (data.emailSubject && data.recipientEmail) {
+                        addEmailResponse(data, true);
+                    } else {
+                        addEmailResponse({error: 'Email generated and saved to drafts.'}, false);
+                    }
+                } else {
+                    addEmailResponse({error: 'Server error occurred while processing your request.'}, false);
+                }
+            } catch (error) {
+                hideTyping();
+                addEmailResponse({error: 'Connection error. Please check your network and try again.'}, false);
+            }
+            
+            sendButton.disabled = false;
+            sendButton.textContent = 'Generate';
+        }
+        
+        // Auto-focus input
+        chatInput.focus();
+        
+        // Add some interactive feedback
+        document.addEventListener('DOMContentLoaded', function() {
+            const shapes = document.querySelectorAll('.shape');
+            shapes.forEach(shape => {
+                shape.addEventListener('mouseenter', function() {
+                    this.style.opacity = '0.3';
+                });
+                shape.addEventListener('mouseleave', function() {
+                    this.style.opacity = '0.1';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
